@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 import httpx
 from fastapi.middleware.cors import CORSMiddleware
 from models import ActivityRequest, RateCard
+import os
 
 app = FastAPI()
 
@@ -9,7 +10,8 @@ origins = [
     "http://localhost:8080",  # React development server
     "http://localhost",  # React dev server if running directly via `localhost`
     # Add your production frontend URL here when deployed
-    "https://voya/trips.com",  # frontend
+    "https://voya-trips.com",  # frontend
+    "https://www.voya-trips.com",
 ]
 
 app.add_middleware(
@@ -22,7 +24,8 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
-BACKEND_URL = "http://127.0.0.1:8000"
+# Get backend URL from environment variable or use default
+BACKEND_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:8000")
 
 http_client = httpx.AsyncClient()
 
