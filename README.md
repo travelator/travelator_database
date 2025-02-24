@@ -27,28 +27,47 @@ pip install -r requirements.txt
 
 Start the service using uvicorn:
 ```bash
-# Default port (8000)
+# Default port (5000)
 uvicorn main:app --reload
 
-# Specify a different port (e.g., 8001)
-uvicorn main:app --reload --port 8001
+# Specify a different port if needed
+uvicorn main:app --reload --port 5001
 
 # Specify host and port
-uvicorn main:app --reload --host 0.0.0.0 --port 8001
+uvicorn main:app --reload --host 0.0.0.0 --port 5001
 ```
 
 The API will be available at:
-- Default: `http://localhost:8000`
+- Default: `http://localhost:5000`
 - Custom port: `http://localhost:PORT`
+
+### Docker Port Mapping
+
+If you're running the service alongside other Docker containers:
+
+1. The service runs on port 5000 inside the container
+2. You can map it to any available host port in your docker-compose.yml:
+```yaml
+services:
+  database-api:
+    build: .
+    ports:
+      - "5000:5000"  # host:container
+```
+
+Or when running with docker run:
+```bash
+docker run -p 5000:5000 your-image-name
+```
 
 ### Troubleshooting
 
 If you see "Address already in use" error:
 1. Choose a different port using `--port`
-2. Or find and stop the process using port 8000:
+2. Or find and stop the process using the port:
 ```bash
-# Find process using port 8000
-lsof -i :8000
+# Find process using port 5000
+lsof -i :5000
 
 # Kill the process
 kill -9 <PID>
