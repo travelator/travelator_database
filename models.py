@@ -19,13 +19,13 @@ class Theme(str, Enum):
 
 class ActivityRequest(BaseModel):
     city: str
-    timeOfDay: List[str]  # timeOfDay is now a list of strings
+    timeOfDay: List[str]
     group: str
 
 
 class Preference(BaseModel):
-    title: str
-    liked: bool
+    disliked: List[str]
+    liked: List[str]
 
 
 class RateCard(BaseModel):
