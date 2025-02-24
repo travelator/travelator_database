@@ -22,7 +22,7 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
-BACKEND_URL = "https://your-backend-service.com/api"
+BACKEND_URL = "http://127.0.0.1:8000"
 
 http_client = httpx.AsyncClient()
 
@@ -62,4 +62,4 @@ async def itinerary(rate_card_response: RateCard):
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=5000)
