@@ -11,7 +11,6 @@ app = FastAPI()
 origins = [
     "http://localhost:8080",  # React development server
     "http://localhost",  # React dev server if running directly via `localhost`
-    # Add your production frontend URL here when deployed
     "https://voya-trips.com",  # frontend
     "https://www.voya-trips.com",
 ]
@@ -26,6 +25,8 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
+MAX_TIMEOUT = 120
+
 # Get backend URL from environment variable or use default
 BACKEND_URL = os.getenv("BACKEND_URL")
 
@@ -33,34 +34,28 @@ http_client = httpx.AsyncClient()
 
 @app.post("/activities")
 async def activities(initial_parameters: ActivityRequest):
-    try:
-        response = await http_client.post(
-            f"{BACKEND_URL}/activities", json=initial_parameters.model_dump()
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            f"{BACKEND_URL}/activities", json=initial_parameters.model_dump(), timeout=MAX_TIMEOUT
         )
-        print(response)
         return response.json()
-    except httpx.HTTPStatusError as e:
-        raise HTTPException(
-            status_code=e.response.status_code, detail=e.response.text
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/itinerary")
 async def itinerary(rate_card_response: RateCard):
-    try:
-        response = await http_client.post(
-            f"{BACKEND_URL}/itinerary", json=rate_card_response.model_dump()
-        )
-        response.raise_for_status()
-        return response.json()
-    except httpx.HTTPStatusError as e:
-        raise HTTPException(
-            status_code=e.response.status_code, detail=e.response.text
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.post(
+                f"{BACKEND_URL}/itinerary", json=rate_card_response.model_dump(), timeout=MAX_TIMEOUT
+            )
+            response.raise_for_status()
+            return response.json()
+        except httpx.HTTPStatusError as e:
+            raise HTTPException(
+                status_code=e.response.status_code, detail=e.response.text
+            )
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
 
 
 if __name__ == "__main__":
