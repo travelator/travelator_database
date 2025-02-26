@@ -51,7 +51,7 @@ class Activity(BaseModel):
     description: str = Field(
         description="Detailed description of the activity."
     )
-    image_link: HttpUrl = Field(
+    image_link: List[str] = Field(
         description="URL to an image representing the activity."
     )
     price: float = Field(
