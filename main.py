@@ -32,11 +32,14 @@ BACKEND_URL = os.getenv("BACKEND_URL")
 
 http_client = httpx.AsyncClient()
 
+
 @app.post("/activities")
 async def activities(initial_parameters: ActivityRequest):
     async with httpx.AsyncClient() as client:
         response = await client.post(
-            f"{BACKEND_URL}/activities", json=initial_parameters.model_dump(), timeout=MAX_TIMEOUT
+            f"{BACKEND_URL}/activities",
+            json=initial_parameters.model_dump(),
+            timeout=MAX_TIMEOUT,
         )
         return response.json()
 
@@ -46,7 +49,9 @@ async def itinerary(rate_card_response: RateCard):
     async with httpx.AsyncClient() as client:
         try:
             response = await client.post(
-                f"{BACKEND_URL}/itinerary", json=rate_card_response.model_dump(), timeout=MAX_TIMEOUT
+                f"{BACKEND_URL}/itinerary",
+                json=rate_card_response.model_dump(),
+                timeout=MAX_TIMEOUT,
             )
             response.raise_for_status()
             return response.json()
