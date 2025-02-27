@@ -24,8 +24,8 @@ class ActivityRequest(BaseModel):
 
 
 class Preference(BaseModel):
-    disliked: List[str]
     liked: List[str]
+    disliked: List[str]
 
 
 class RateCard(BaseModel):
