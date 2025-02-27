@@ -1,13 +1,21 @@
-from fastapi import FastAPI, HTTPException
-import httpx
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from models import ActivityRequest, RateCard
+from routes import activities, itinerary
 from dotenv import load_dotenv
 import os
 
+# Load environment variables
 load_dotenv()
-app = FastAPI()
 
+# Configuration
+BACKEND_URL = os.getenv("BACKEND_URL")
+PORT = int(os.getenv("PORT", "5000"))
+MAX_TIMEOUT = 120
+
+# Create FastAPI app
+app = FastAPI(title="Travelator Database API")
+
+# Configure CORS
 origins = [
     "http://localhost:8080",  # React development server
     "http://localhost",  # React dev server if running directly via `localhost`
@@ -19,59 +27,15 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=[
-        "*"
-    ],  # Allows all HTTP methods (GET, POST, PUT, DELETE, etc.)
-    allow_headers=["*"],  # Allows all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
-MAX_TIMEOUT = 120
-
-# Get backend URL from environment variable or use default
-BACKEND_URL = os.getenv("BACKEND_URL")
-
-http_client = httpx.AsyncClient()
-
-
-@app.post("/activities")
-async def activities(initial_parameters: ActivityRequest):
-    async with httpx.AsyncClient() as client:
-        try:
-            response = await client.post(
-                f"{BACKEND_URL}/activities",
-                json=initial_parameters.model_dump(),
-                timeout=MAX_TIMEOUT,
-            )
-            response.raise_for_status()
-            return response.json()
-        except httpx.HTTPStatusError as e:
-            raise HTTPException(
-                status_code=e.response.status_code, detail=e.response.text
-            )
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.post("/itinerary")
-async def itinerary(rate_card_response: RateCard):
-    async with httpx.AsyncClient() as client:
-        try:
-            response = await client.post(
-                f"{BACKEND_URL}/itinerary",
-                json=rate_card_response.model_dump(),
-                timeout=MAX_TIMEOUT,
-            )
-            response.raise_for_status()
-            return response.json()
-        except httpx.HTTPStatusError as e:
-            raise HTTPException(
-                status_code=e.response.status_code, detail=e.response.text
-            )
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
-
+# Include routers
+app.include_router(activities.router)
+app.include_router(itinerary.router)
 
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=5000)
+    uvicorn.run(app, host="0.0.0.0", port=PORT)
