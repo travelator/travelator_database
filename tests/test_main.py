@@ -1,7 +1,8 @@
 import pytest
 from fastapi.testclient import TestClient
 from unittest.mock import patch, MagicMock
-import httpx
+
+# import httpx
 from main import app
 
 
@@ -24,7 +25,7 @@ def mock_http_client():
 
 class TestActivitiesEndpoint:
     def test_success(self, mock_http_client):
-        assert(1==1)
+        assert 1 == 1
         # Mock response data
         """
         mock_response = MagicMock()
