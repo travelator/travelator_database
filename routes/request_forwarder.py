@@ -10,7 +10,7 @@ async def forward_request(request: Request, method: str, url: str) -> Response:
     body = await request.body()
     try:
         json_body = json.loads(body)
-    except:
+    except json.JSONDecodeError:
         json_body = None
 
     query_params = request.query_params
