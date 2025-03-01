@@ -1,5 +1,6 @@
 from fastapi import Request, Response
 import httpx
+MAX_TIMEOUT = 120
 
 
 async def forward_request(request: Request, method: str, url: str) -> Response:
@@ -11,7 +12,7 @@ async def forward_request(request: Request, method: str, url: str) -> Response:
             url=url,
             json=await request.json(),
             cookies=cookies,
-            timeout=120,
+            timeout=MAX_TIMEOUT,
         )
         response.raise_for_status()
 
