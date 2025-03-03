@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes import activities, itinerary, default
+from routes import activities, itinerary, default, saving
 from dotenv import load_dotenv
 import os
 
@@ -8,7 +8,7 @@ import os
 load_dotenv()
 
 # Configuration
-BACKEND_URL = os.getenv("BACKEND_URL")
+#BACKEND_URL = os.getenv("BACKEND_URL")
 PORT = int(os.getenv("PORT", "5000"))
 
 # Create FastAPI app
@@ -31,9 +31,10 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(activities.router)
-app.include_router(itinerary.router)
-app.include_router(default.router)
+#app.include_router(activities.router)
+#app.include_router(itinerary.router)
+#app.include_router(default.router)
+app.include_router(saving.router)
 
 if __name__ == "__main__":
     import uvicorn
