@@ -68,3 +68,8 @@ jobs:
                 context: .
                 push: true
                 tags: ghcr.io/travelator/database-api:latest
+                platforms: linux/amd64,linux/arm64
+                build-args: |
+                  PROJECT_URL=${{ secrets.PROJECT_URL }}
+                  API_KEY=${{ secrets.API_KEY }}
+                  AUTH_URL=${{ secrets.AUTH_URL }}
