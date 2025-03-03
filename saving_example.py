@@ -1,7 +1,7 @@
 import requests
 import json
 
-BASE_URL = "http://0.0.0.0:5000"  # change to actual working base url
+BASE_URL = "http://0.0.0.0:8080"  # change to actual working base url
 
 # Login to get the session cookie
 login_url = "https://travelator-auth.ambitioussand-14e274b0.uksouth.azurecontainerapps.io/login"
@@ -56,7 +56,7 @@ trip_data = {
     ]
 }
 
-# Send POST request to save the trip
+
 headers = {"Content-Type": "application/json"}
 cookies = {"token": token_cookie}
 response = requests.post(f"{BASE_URL}/save", data=json.dumps(trip_data), headers=headers, cookies=cookies)
@@ -64,6 +64,72 @@ response = requests.post(f"{BASE_URL}/save", data=json.dumps(trip_data), headers
 print(f"Status Code: {response.status_code}")
 print(f"Response: {response.json()}")
 
+trip_id = response.json().get("trip_id")
+
+if not trip_id:
+    print("Failed to get trip_id from save response")
+    exit(1)
+
 response = requests.get(f"{BASE_URL}/trips", headers=headers, cookies=cookies)
 print(f"Status Code: {response.status_code}")
 print(f"Response: {response.json()}")
+
+view_response = requests.get(f"{BASE_URL}/trips/{trip_id}", headers=headers, cookies=cookies)
+print(f"View Single Trip Status Code: {view_response.status_code}")
+print(f"View Single Trip Response: {view_response.json()}")
+
+updated_trip_data = {
+    "trip": {
+        "city": "Krakow",
+        "custom_name": "Updated Test Trip",
+        "date_of_trip": "2025-04-01",
+        "time_of_day": "Afternoon",
+        "group": "Family"
+    },
+    "activities": [
+        {
+            "title": "Castle Tour",
+            "start": "2:00 PM",
+            "end": "4:00 PM",
+            "description": "Visit to Wawel Castle",
+            "price": 15.0,
+            "theme": "History",
+            "transport_mode": "Walk",
+            "requires_booking": True,
+            "image_link": "",
+            "duration": 120,
+            "weather": "Sunny",
+            "id": 1,
+            "booking_url": "https://wawel.krakow.pl"
+        },
+        {
+            "title": "Traditional Polish Dinner",
+            "start": "7:00 PM",
+            "end": "9:00 PM",
+            "description": "Enjoy traditional Polish cuisine",
+            "price": 30.0,
+            "theme": "Food",
+            "transport_mode": "Taxi",
+            "requires_booking": True,
+            "booking_url": "https://restaurant.krakow.pl",
+            "image_link": "",
+            "duration": 120,
+            "weather": "",
+            "id": 2
+        }
+    ]
+}
+
+edit_response = requests.put(f"{BASE_URL}/trips/{trip_id}", data=json.dumps(updated_trip_data), headers=headers, cookies=cookies)
+
+print(f"Edit Trip Status Code: {edit_response.status_code}")
+print(f"Edit Trip Response: {edit_response.json()}")
+
+delete_response = requests.delete(f"{BASE_URL}/trips/{trip_id}", headers=headers, cookies=cookies)
+print(f"Delete Trip Status Code: {delete_response.status_code}")
+print(f"Delete Trip Response: {delete_response.json()}")
+
+# Attempt to view the deleted trip (should return 404)
+view_deleted_response = requests.get(f"{BASE_URL}/trips/{trip_id}", headers=headers, cookies=cookies)
+print(f"View Deleted Trip Status Code: {view_deleted_response.status_code}")
+print(f"View Deleted Trip Response: {view_deleted_response.json()}")

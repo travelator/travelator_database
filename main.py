@@ -8,7 +8,7 @@ import os
 load_dotenv()
 
 # Configuration
-BACKEND_URL = os.getenv("BACKEND_URL")
+# BACKEND_URL = os.getenv("BACKEND_URL")
 PORT = int(os.getenv("PORT", "5000"))
 
 # Create FastAPI app

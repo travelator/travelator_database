@@ -1,11 +1,12 @@
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import APIKeyCookie
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 import requests
 from supabase import create_client, Client
 import os
 from dotenv import load_dotenv
+from uuid import UUID
 
 load_dotenv()
 
@@ -45,6 +46,11 @@ class Trip(BaseModel):
 class TripRequest(BaseModel):
     trip: Trip
     activities: List[Activity]
+
+
+class TripUpdateRequest(BaseModel):
+    trip: Trip
+    activities: Optional[List[Activity]] = None
 
 
 cookie_sec = APIKeyCookie(name="token")
@@ -94,7 +100,6 @@ async def save_trip(trip_request: TripRequest, user_id: str = Depends(get_curren
 @router.get("/trips")
 async def get_trips(user_id: str = Depends(get_current_user)):
     try:
-
         trips_response = supabase.table("trips").select("*").eq("user_id", user_id).execute()
 
         if not trips_response.data:
@@ -102,22 +107,99 @@ async def get_trips(user_id: str = Depends(get_current_user)):
 
         trips = trips_response.data
 
-        trip_activities = {}
+        trips_with_activities = []
 
         for trip in trips:
             trip_id = trip["trip_id"]
-            trip_name = trip["custom_name"]
 
-            activities_response = supabase.table("activities").select("*").eq("trip_id", trip_id).order("id").execute()
+            # Fetch activities for the current trip
+            activities_response = supabase.table("activities").select("*").eq("trip_id", trip_id).execute()
 
-            if not activities_response.data:
-                trip_activities[trip_name] = ["No activities found"]
-            else:
-                activities = activities_response.data
-                activity_names = [activity["title"] for activity in activities]
-                trip_activities[trip_name] = activity_names
+            # Add activities to the trip object
+            trip["activities"] = activities_response.data if activities_response.data else []
 
-        return {"user_id": user_id, "trips": trip_activities}
+            trips_with_activities.append(trip)
+
+        return {"user_id": user_id, "trips": trips_with_activities}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/trips/{trip_id}")
+async def get_single_trip(
+    trip_id: UUID,
+    user_id: str = Depends(get_current_user)
+):
+    try:
+        trip_response = supabase.table("trips").select("*").eq("trip_id", str(trip_id)).eq("user_id", user_id).execute()
+
+        if not trip_response.data:
+            raise HTTPException(status_code=404, detail="Trip not found or does not belong to the user")
+
+        trip = trip_response.data[0]
+
+        activities_response = supabase.table("activities").select("*").eq("trip_id", str(trip_id)).execute()
+
+        trip["activities"] = activities_response.data if activities_response.data else []
+
+        return trip
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.put("/trips/{trip_id}")
+async def edit_trip(
+    trip_id: UUID,
+    trip_update_request: TripUpdateRequest,
+    user_id: str = Depends(get_current_user)
+):
+    try:
+        trip_response = supabase.table("trips").select("*").eq("trip_id", trip_id).eq("user_id", user_id).execute()
+
+        if not trip_response.data:
+            raise HTTPException(status_code=404, detail="Trip not found or does not belong to the user")
+
+        if trip_update_request.trip:
+            update_data = {k: v for k, v in trip_update_request.trip.model_dump().items() if v is not None}
+            if update_data:
+                supabase.table("trips").update(update_data).eq("trip_id", str(trip_id)).execute()
+
+        if trip_update_request.activities:
+            supabase.table("activities").delete().eq("trip_id", str(trip_id)).execute()
+
+            new_activities = [activity.model_dump() for activity in trip_update_request.activities]
+            for activity in new_activities:
+                activity["trip_id"] = str(trip_id)
+
+            supabase.table("activities").insert(new_activities).execute()
+
+        return {"success": "Trip and activities updated successfully"}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.delete("/trips/{trip_id}")
+async def delete_trip(
+    trip_id: UUID,
+    user_id: str = Depends(get_current_user)
+):
+    try:
+        trip_response = supabase.table("trips").select("*").eq("trip_id", str(trip_id)).eq("user_id", user_id).execute()
+
+        if not trip_response.data:
+            raise HTTPException(status_code=404, detail="Trip not found or does not belong to the user")
+
+        supabase.table("activities").delete().eq("trip_id", str(trip_id)).execute()
+
+        trip_delete_response = supabase.table("trips").delete().eq("trip_id", str(trip_id)).execute()
+
+        if trip_delete_response.data:
+            return {"success": "Trip and associated activities deleted successfully"}
+        else:
+            raise HTTPException(status_code=500, detail="Failed to delete the trip")
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
