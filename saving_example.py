@@ -1,7 +1,7 @@
 import requests
 import json
 
-BASE_URL = "http://0.0.0.0:5000" # change to actual working base url
+BASE_URL = "http://0.0.0.0:5000"  # change to actual working base url
 
 # Login to get the session cookie
 login_url = "https://travelator-auth.ambitioussand-14e274b0.uksouth.azurecontainerapps.io/login"
