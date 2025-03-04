@@ -47,8 +47,8 @@ async def get_directions(request: DirectionsRequest):
     return {"routes": route_data}
 
 
-app.include_router(default.router)
 app.include_router(saving.router)
+app.include_router(default.router)
 
 
 if __name__ == "__main__":
