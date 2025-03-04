@@ -102,3 +102,18 @@ class FullItinerary(BaseModel):
     itinerary: list[ItineraryItem] = Field(
         description="A full day itinerary for the given location"
     )
+
+
+# Request model for directions API
+class DirectionsRequest(BaseModel):
+    origin: list[float]  # [latitude, longitude]
+    destination: list[float]  # [latitude, longitude]
+    mode: str = (
+        "transit"  # Default to transit (options: driving, walking, transit)
+    )
+
+
+# Request model for itinerary map
+class ItineraryRequest(BaseModel):
+    city: str
+    itinerary: list[dict]  # List of places with names & locations

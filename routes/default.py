@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, HTTPException
 from config import BACKEND_URL
 from .request_forwarder import forward_request
 
@@ -10,6 +10,10 @@ router = APIRouter()
 )
 async def catch_all(request: Request, path_name: str):
     """Catch all route that forwards the request."""
+    # Exclude /get-directions from being forwarded
+    if path_name == "get-directions":
+        raise HTTPException(status_code=404, detail="Not Found")
+
     url = f"{BACKEND_URL}/{path_name}"
     return await forward_request(
         request=request,

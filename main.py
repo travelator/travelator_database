@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from routes import activities, itinerary, default
 from dotenv import load_dotenv
 import os
+from map import get_google_directions, DirectionsRequest
 
 # Load environment variables
 load_dotenv()
@@ -33,7 +34,21 @@ app.add_middleware(
 # Include routers
 app.include_router(activities.router)
 app.include_router(itinerary.router)
+
+
+@app.post("/get-directions")
+async def get_directions(request: DirectionsRequest):
+    route_data = get_google_directions(
+        request.origin, request.destination, request.mode
+    )
+    if not route_data:
+        return {"error": "No route found"}
+
+    return {"routes": route_data}
+
+
 app.include_router(default.router)
+
 
 if __name__ == "__main__":
     import uvicorn
