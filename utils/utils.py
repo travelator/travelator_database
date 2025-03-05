@@ -1,4 +1,4 @@
-from models import Trip, ItineraryItem, Activity
+from models.models import Trip, ItineraryItem, Activity
 from datetime import datetime
 from typing import List
 

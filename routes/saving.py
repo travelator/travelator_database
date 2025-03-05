@@ -1,14 +1,14 @@
 from fastapi import APIRouter, HTTPException, Depends, Cookie
 from fastapi.security import APIKeyCookie
-from pydantic import BaseModel
-from typing import List, Optional
 import requests
 from supabase import create_client, Client
 import os
 from dotenv import load_dotenv
 from uuid import UUID
-from models import FullItinerary, Activity
-from utils import (
+from models.models import (
+    FullItinerary,
+)
+from utils.utils import (
     create_trip_data,
     itinerary_to_activity,
     activity_to_itinerary,
@@ -24,25 +24,6 @@ auth_url: str = os.getenv("AUTH_URL")
 supabase: Client = create_client(url, key)
 
 router = APIRouter()
-
-
-class Trip(BaseModel):
-    city: str
-    custom_name: str
-    date_of_trip: str
-    time_of_day: str
-    group: str
-
-
-class TripRequest(BaseModel):
-    trip: Trip
-    activities: List[Activity]
-
-
-class TripUpdateRequest(BaseModel):
-    trip: Trip
-    activities: Optional[List[Activity]] = None
-
 
 cookie_sec = APIKeyCookie(name="token")
 

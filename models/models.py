@@ -82,7 +82,16 @@ class Trip(BaseModel):
     group: str
 
 
-# Request model for directions API
+class TripRequest(BaseModel):
+    trip: Trip
+    activities: List[Activity]
+
+
+class TripUpdateRequest(BaseModel):
+    trip: Trip
+    activities: Optional[List[Activity]] = None
+
+
 class DirectionsRequest(BaseModel):
     origin: list[float]  # [latitude, longitude]
     destination: list[float]  # [latitude, longitude]
@@ -91,7 +100,6 @@ class DirectionsRequest(BaseModel):
     )
 
 
-# Request model for itinerary map
 class ItineraryRequest(BaseModel):
     city: str
     itinerary: list[dict]  # List of places with names & locations
