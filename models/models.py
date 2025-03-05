@@ -25,26 +25,29 @@ class ItineraryItem(BaseModel):
         description="Indicates if the item requires booking."
     )
     booking_url: Optional[str] = Field(
-        description="URL for booking the itinerary item."
+        default=None, description="URL for booking the itinerary item."
     )
     weather: Optional[str] = Field(
-        description="weather conditions for the given activity. Do not generate."
+        default=None,
+        description="Weather conditions for the given activity. Do not generate.",
     )
     temperature: Optional[int] = Field(
-        description="temperature in celsius for the given activity. Do not generate."
+        default=None,
+        description="Temperature in celsius for the given activity. Do not generate.",
     )
     image_link: List[str] = Field(
-        description="URLs of images representing the activity. Do not generate."
+        default=[],
+        description="URLs of images representing the activity. Do not generate.",
     )
     duration: int = Field(
         description="Duration of the itinerary item in minutes."
     )
     id: int = Field(description="Unique identifier for the itinerary item.")
     latitude: Optional[float] = Field(
-        description="Latitude position of the given activity."
+        default=None, description="Latitude position of the given activity."
     )
     longitude: Optional[float] = Field(
-        description="Longitude position of the given activity."
+        default=None, description="Longitude position of the given activity."
     )
 
 
