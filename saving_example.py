@@ -21,7 +21,7 @@ trip_data = {
         "custom_name": "Test trip 3",
         "date_of_trip": "2025-03-15",
         "time_of_day": "Morning",
-        "group": "Friends"
+        "group": "Friends",
     },
     "activities": [
         {
@@ -36,7 +36,7 @@ trip_data = {
             "image_link": "",
             "duration": 2,
             "weather": "Sunny",
-            "id": 1
+            "id": 1,
         },
         {
             "title": "Lunch at Local Restaurant",
@@ -51,15 +51,20 @@ trip_data = {
             "image_link": "",
             "duration": 90,
             "weather": "",
-            "id": 2
-        }
-    ]
+            "id": 2,
+        },
+    ],
 }
 
 
 headers = {"Content-Type": "application/json"}
 cookies = {"token": token_cookie}
-response = requests.post(f"{BASE_URL}/save", data=json.dumps(trip_data), headers=headers, cookies=cookies)
+response = requests.post(
+    f"{BASE_URL}/save",
+    data=json.dumps(trip_data),
+    headers=headers,
+    cookies=cookies,
+)
 
 print(f"Status Code: {response.status_code}")
 print(f"Response: {response.json()}")
@@ -74,7 +79,9 @@ response = requests.get(f"{BASE_URL}/trips", headers=headers, cookies=cookies)
 print(f"Status Code: {response.status_code}")
 print(f"Response: {response.json()}")
 
-view_response = requests.get(f"{BASE_URL}/trips/{trip_id}", headers=headers, cookies=cookies)
+view_response = requests.get(
+    f"{BASE_URL}/trips/{trip_id}", headers=headers, cookies=cookies
+)
 print(f"View Single Trip Status Code: {view_response.status_code}")
 print(f"View Single Trip Response: {view_response.json()}")
 
@@ -84,7 +91,7 @@ updated_trip_data = {
         "custom_name": "Updated Test Trip",
         "date_of_trip": "2025-04-01",
         "time_of_day": "Afternoon",
-        "group": "Family"
+        "group": "Family",
     },
     "activities": [
         {
@@ -100,7 +107,7 @@ updated_trip_data = {
             "duration": 120,
             "weather": "Sunny",
             "id": 1,
-            "booking_url": "https://wawel.krakow.pl"
+            "booking_url": "https://wawel.krakow.pl",
         },
         {
             "title": "Traditional Polish Dinner",
@@ -115,21 +122,30 @@ updated_trip_data = {
             "image_link": "",
             "duration": 120,
             "weather": "",
-            "id": 2
-        }
-    ]
+            "id": 2,
+        },
+    ],
 }
 
-edit_response = requests.put(f"{BASE_URL}/trips/{trip_id}", data=json.dumps(updated_trip_data), headers=headers, cookies=cookies)
+edit_response = requests.put(
+    f"{BASE_URL}/trips/{trip_id}",
+    data=json.dumps(updated_trip_data),
+    headers=headers,
+    cookies=cookies,
+)
 
 print(f"Edit Trip Status Code: {edit_response.status_code}")
 print(f"Edit Trip Response: {edit_response.json()}")
 
-delete_response = requests.delete(f"{BASE_URL}/trips/{trip_id}", headers=headers, cookies=cookies)
+delete_response = requests.delete(
+    f"{BASE_URL}/trips/{trip_id}", headers=headers, cookies=cookies
+)
 print(f"Delete Trip Status Code: {delete_response.status_code}")
 print(f"Delete Trip Response: {delete_response.json()}")
 
 # Attempt to view the deleted trip (should return 404)
-view_deleted_response = requests.get(f"{BASE_URL}/trips/{trip_id}", headers=headers, cookies=cookies)
+view_deleted_response = requests.get(
+    f"{BASE_URL}/trips/{trip_id}", headers=headers, cookies=cookies
+)
 print(f"View Deleted Trip Status Code: {view_deleted_response.status_code}")
 print(f"View Deleted Trip Response: {view_deleted_response.json()}")
