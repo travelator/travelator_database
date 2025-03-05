@@ -195,53 +195,41 @@ async def get_single_trip(
 @router.put("/trips/{trip_id}")
 async def edit_trip(
     trip_id: UUID,
-    trip_update_request: TripUpdateRequest,
+    trip_update_request: FullItinerary,
     user_id: str = Depends(get_current_user),
 ):
-    try:
-        trip_response = (
-            supabase.table("trips")
-            .select("*")
-            .eq("trip_id", trip_id)
-            .eq("user_id", user_id)
-            .execute()
+
+    # Convert acitivity to the correct format (comma separated lists rather than str)
+    activities = [
+        itinerary_to_activity(activity).model_dump()
+        for activity in trip_update_request.itinerary
+    ]
+
+    trip_response = (
+        supabase.table("trips")
+        .select("*")
+        .eq("trip_id", trip_id)
+        .eq("user_id", user_id)
+        .execute()
+    )
+
+    if not trip_response.data:
+        raise HTTPException(
+            status_code=404,
+            detail="Trip not found or does not belong to the user",
         )
 
-        if not trip_response.data:
-            raise HTTPException(
-                status_code=404,
-                detail="Trip not found or does not belong to the user",
-            )
+    if activities:
+        supabase.table("activities").delete().eq(
+            "trip_id", str(trip_id)
+        ).execute()
 
-        if trip_update_request.trip:
-            update_data = {
-                k: v
-                for k, v in trip_update_request.trip.model_dump().items()
-                if v is not None
-            }
-            if update_data:
-                supabase.table("trips").update(update_data).eq(
-                    "trip_id", str(trip_id)
-                ).execute()
+        for activity in activities:
+            activity["trip_id"] = str(trip_id)
 
-        if trip_update_request.activities:
-            supabase.table("activities").delete().eq(
-                "trip_id", str(trip_id)
-            ).execute()
+        supabase.table("activities").insert(activities).execute()
 
-            new_activities = [
-                activity.model_dump()
-                for activity in trip_update_request.activities
-            ]
-            for activity in new_activities:
-                activity["trip_id"] = str(trip_id)
-
-            supabase.table("activities").insert(new_activities).execute()
-
-        return {"success": "Trip and activities updated successfully"}
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    return {"success": "Trip and activities updated successfully"}
 
 
 @router.delete("/trips/{trip_id}")
