@@ -6,7 +6,7 @@ import os
 from map import get_google_directions, DirectionsRequest
 
 # Load environment variables
-load_dotenv()
+load_dotenv(override=True)
 
 # Configuration
 # BACKEND_URL = os.getenv("BACKEND_URL")
@@ -47,9 +47,9 @@ async def get_directions(request: DirectionsRequest):
     return {"routes": route_data}
 
 
-app.include_router(default.router)
 app.include_router(saving.router)
 
+app.include_router(default.router)
 
 if __name__ == "__main__":
     import uvicorn
