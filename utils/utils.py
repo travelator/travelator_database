@@ -28,6 +28,7 @@ def create_trip_data(location: str, timeOfday: List[str], group: str) -> Trip:
         city=location,
         custom_name=f"Trip to {location_str}",
         date_of_trip=current_date,
+        date_created=current_date,
         time_of_day=time_of_day,
         group=group_str,
     )

@@ -81,6 +81,7 @@ class Trip(BaseModel):
     city: str
     custom_name: str
     date_of_trip: str
+    date_created: str
     time_of_day: str
     group: str
 
