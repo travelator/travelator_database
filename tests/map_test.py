@@ -1,6 +1,5 @@
 import pytest
 from unittest.mock import patch, MagicMock
-import json
 import os
 from fastapi.testclient import TestClient
 
@@ -208,7 +207,7 @@ def test_missing_api_key():
             mock_get.return_value = mock_response
 
             # Call the function under test
-            result = get_google_directions(MOCK_ORIGIN, MOCK_DESTINATION)
+            get_google_directions(MOCK_ORIGIN, MOCK_DESTINATION)
 
             # The function should still make the API call, but with a None API key
             assert mock_get.called
