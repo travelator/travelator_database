@@ -53,9 +53,9 @@ async def save_trip(
     location = cookie_data.get("city", None)
     timeOfDay = cookie_data.get("timeOfDay", None)
     group = cookie_data.get("group", None)
-    # uni = cookie_data.get("uniqueness", None)
+    date = cookie_data.get("date", None)
 
-    trip = create_trip_data(location, timeOfDay, group).model_dump()
+    trip = create_trip_data(location, timeOfDay, group, date).model_dump()
     trip["user_id"] = user_id
     trip_response = supabase.table("trips").insert(trip).execute()
 
