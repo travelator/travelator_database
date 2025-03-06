@@ -106,6 +106,7 @@ def test_get_google_directions_exception(mock_env_api_key):
         assert mock_get.called
         assert result is None
 
+
 def test_get_directions_success():
     # Configure the mock to return a successful response
     with patch('routes.map.get_google_directions') as mock_get_google_directions:
