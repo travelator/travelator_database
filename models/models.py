@@ -80,8 +80,8 @@ class Activity(BaseModel):
 class Trip(BaseModel):
     city: str
     custom_name: str
-    date_of_trip: str
-    date_created: str
+    date_of_trip: Optional[str] = None
+    date_created: Optional[str] = None
     time_of_day: str
     group: str
 

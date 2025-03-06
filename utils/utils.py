@@ -3,7 +3,9 @@ from datetime import datetime
 from typing import List
 
 
-def create_trip_data(location: str, timeOfday: List[str], group: str) -> Trip:
+def create_trip_data(
+    location: str, timeOfday: List[str], group: str, date: str = None
+) -> Trip:
     """Create a trip data object for the given location."""
     # Get the current date
     current_date = datetime.now().strftime("%Y-%m-%d")
@@ -27,8 +29,8 @@ def create_trip_data(location: str, timeOfday: List[str], group: str) -> Trip:
     trip = Trip(
         city=location,
         custom_name=f"Trip to {location_str}",
-        date_of_trip=current_date,
         date_created=current_date,
+        date_of_trip=date,
         time_of_day=time_of_day,
         group=group_str,
     )
